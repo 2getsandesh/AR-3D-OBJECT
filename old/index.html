@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Product Viewer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            height: 100%;
+            overflow: hidden;
+            color: #ffffff;
+        }
+
+        .container {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .btn-start {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-stop {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: linear-gradient(45deg, #1a237e, #0097a7);
+            animation: gradientBG 15s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .ar-elements {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .ar-element {
+            position: absolute;
+            opacity: 0.7;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .glow {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            animation: pulse 4s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.5); opacity: 0.4; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="ar-elements">
+        <svg class="ar-element" style="top: 10%; left: 10%;" width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 17.0001H18L21 20.0001V17.0001H23V4.00006H7V13.0001M13 17.0001V13.0001H7M13 17.0001H1V8.00006H7" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg class="ar-element" style="top: 70%; left: 80%;" width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 18.5V19.38C12 21.25 11.25 22 9.37 22H4.62C2.75 22 2 21.25 2 19.38V14.63C2 12.75 2.75 12 4.62 12H5.5V15.5C5.5 17.16 6.84 18.5 8.5 18.5H12Z" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M17 13.5V14.37C17 16.25 16.25 17 14.37 17H9.62C7.75 17 7 16.25 7 14.37V9.62C7 7.75 7.75 7 9.62 7H10.5V10.5C10.5 12.16 11.84 13.5 13.5 13.5H17Z" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22 4.62V9.37C22 11.25 21.25 12 19.37 12H14.62C12.75 12 12 11.25 12 9.37V4.62C12 2.75 12.75 2 14.62 2H19.37C21.25 2 22 2.75 22 4.62Z" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg class="ar-element" style="top: 40%; left: 60%;" width="70" height="70" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 8V16C21 18.8284 21 20.2426 20.1213 21.1213C19.2426 22 17.8284 22 15 22H9C6.17157 22 4.75736 22 3.87868 21.1213C3 20.2426 3 18.8284 3 16V8C3 5.17157 3 3.75736 3.87868 2.87868C4.75736 2 6.17157 2 9 2H15C17.8284 2 19.2426 2 20.1213 2.87868C21 3.75736 21 5.17157 21 8Z" stroke="#ffffff" stroke-width="1.5"/>
+            <path d="M3 8L21 8" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M9 15L15 15" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M9 18L12 18" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <div class="glow" style="top: 20%; left: 30%;"></div>
+        <div class="glow" style="top: 60%; left: 70%;"></div>
+        <div class="glow" style="top: 80%; left: 20%;"></div>
+    </div>
+    <div class="container">
+        <h1>AR QR - The AR Product Explorer</h1>
+        <p>Experience your products like never before with our cutting-edge Augmented Reality viewer. Bring your catalog to life and engage customers in a whole new dimension!</p>
+        <div id="control">
+            <button id="startButton" class="btn btn-start">Start AR Experience</button>
+            <button id="stopButton" class="btn btn-stop">Stop AR Experience</button>
+        </div>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+
+        startBtn.addEventListener('click', () => {
+            alert('Starting AR Experience...');
+            // Add your AR initialization code here
+        });
+
+        stopBtn.addEventListener('click', () => {
+            alert('Stopping AR Experience...');
+            // Add your AR cleanup code here
+        });
+    </script>
+</body>
+</html>
