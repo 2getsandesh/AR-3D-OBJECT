@@ -15,11 +15,9 @@
       import { MindARThree } from 'mindar-image-three';
       import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-      console.log("Starting AR setup...");
-
       const mindarThree = new MindARThree({
         container: document.querySelector("#container"),
-        imageTargetSrc: "all-targets.mind" // Use the correct .mind file path here
+        imageTargetSrc: "all-targets.mind" // Use a combined .mind file with all targets
       });
 
       const {renderer, scene, camera} = mindarThree;
@@ -42,10 +40,7 @@
 
       Object.keys(anchors).forEach(index => {
         const anchor = mindarThree.addAnchor(Number(index));
-        console.log(`Loading model for anchor ${index}: ${anchors[index].modelFile}`);
-
         loader.load(anchors[index].modelFile, (gltf) => {
-          console.log(`Loaded model for anchor ${index}`);
           const model = gltf.scene;
           model.scale.set(0.5, 0.5, 0.5); // Scale appropriately
           model.position.set(0, 0, 0); // Center the model
@@ -59,29 +54,18 @@
             const featurePlane = new THREE.Mesh(featureGeometry, featureMaterial);
             featurePlane.position.set(0, -0.75, 0);
             anchor.group.add(featurePlane);
-          }, undefined, (error) => {
-            console.error(`Error loading feature image for anchor ${index}:`, error);
           });
-        }, undefined, (error) => {
-          console.error(`Error loading model for anchor ${index}:`, error);
         });
       });
 
       const start = async () => {
-        try {
-          console.log("Starting MindAR...");
-          await mindarThree.start();
-          renderer.setAnimationLoop(() => {
-            renderer.render(scene, camera);
-          });
-          console.log("MindAR started successfully.");
-        } catch (error) {
-          console.error("Error during MindAR start:", error);
-        }
+        await mindarThree.start();
+        renderer.setAnimationLoop(() => {
+          renderer.render(scene, camera);
+        });
       };
 
       const stop = () => {
-        console.log("Stopping MindAR...");
         mindarThree.stop();
         renderer.setAnimationLoop(null);
       };
@@ -117,3 +101,4 @@
     <div id="container"></div> <!-- Single container for scanning and rendering -->
   </body>
 </html>
+  
