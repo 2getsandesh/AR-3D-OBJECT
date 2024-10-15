@@ -35,13 +35,13 @@
       // Helper function to add feature image alongside the 3D model
       const addFeatureImage = (anchor, imageUrl) => {
         const textureLoader = new THREE.TextureLoader();
-        const planeGeometry = new THREE.PlaneGeometry(1, 0.5); // Adjust the size as needed
+        const planeGeometry = new THREE.PlaneGeometry(3, 3); // Adjust the size as needed
 
         textureLoader.load(imageUrl, (texture) => {
           const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
           const featurePlane = new THREE.Mesh(planeGeometry, material);
 
-          featurePlane.position.set(0, -0.75, 0); // Position the feature below the 3D model
+          featurePlane.position.set(0, 0, -0.5); // Position the feature below the 3D model
           anchor.group.add(featurePlane);
         });
       };
@@ -50,7 +50,7 @@
       const droneAnchor = mindarThree.addAnchor(0); // Target index 0 for drone
       loader.load('Drone.glb', (gltf) => {
         const droneModel = gltf.scene;
-        droneModel.scale.set(0.5, 0.5, 0.5); // Scale the drone model appropriately
+        droneModel.scale.set(1, 1, 1); // Scale the drone model appropriately
         droneModel.position.set(0, 0, 0); // Position it in the center
         droneAnchor.group.add(droneModel); // Add the drone model to the drone anchor
 
@@ -64,7 +64,7 @@
       const laptopAnchor = mindarThree.addAnchor(1); // Target index 1 for laptop
       loader.load('Laptop.glb', (gltf) => {
         const laptopModel = gltf.scene;
-        laptopModel.scale.set(0.5, 0.5, 0.5); // Scale the laptop model appropriately
+        laptopModel.scale.set(0.1, 0.1, 0.1); // Scale the laptop model appropriately
         laptopModel.position.set(0, 0, 0); // Position it in the center
         laptopAnchor.group.add(laptopModel); // Add the laptop model to the laptop anchor
 
@@ -78,7 +78,7 @@
       const phoneAnchor = mindarThree.addAnchor(2); // Target index 2 for phone
       loader.load('Motorcycle.glb', (gltf) => {
         const phoneModel = gltf.scene;
-        phoneModel.scale.set(0.5, 0.5, 0.5); // Scale the phone model appropriately
+        phoneModel.scale.set(0.1, 0.1, 0.1); // Scale the phone model appropriately
         phoneModel.position.set(0, 0, 0); // Position it in the center
         phoneAnchor.group.add(phoneModel); // Add the phone model to the phone anchor
 
@@ -107,6 +107,7 @@
 	mindarThree.stop();
 	mindarThree.renderer.setAnimationLoop(null);
       });
+
     </script>
     <style>
       body {
