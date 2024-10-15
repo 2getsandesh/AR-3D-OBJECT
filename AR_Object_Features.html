@@ -1,0 +1,137 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="importmap">
+    {
+      "imports": {
+	"three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+	"three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+	"mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+      }
+    }
+    </script>
+    <script type="module">
+      import * as THREE from 'three';
+      import { MindARThree } from 'mindar-image-three';
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'; // For loading the models
+
+      const mindarThree = new MindARThree({
+	container: document.querySelector("#container"),
+	imageTargetSrc: "targets.mind" // Multi-target mind file
+      });
+
+      const {renderer, scene, camera} = mindarThree;
+
+      // Add Ambient and Directional Light for the 3D Models
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(1, 1, 1).normalize();
+      scene.add(directionalLight);
+
+      // GLTF Loader for loading the models
+      const loader = new GLTFLoader();
+
+      // Helper function to add feature image alongside the 3D model
+      const addFeatureImage = (anchor, imageUrl) => {
+        const textureLoader = new THREE.TextureLoader();
+        const planeGeometry = new THREE.PlaneGeometry(1, 0.5); // Adjust the size as needed
+
+        textureLoader.load(imageUrl, (texture) => {
+          const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+          const featurePlane = new THREE.Mesh(planeGeometry, material);
+
+          featurePlane.position.set(0, -0.75, 0); // Position the feature below the 3D model
+          anchor.group.add(featurePlane);
+        });
+      };
+
+      // Anchor for Drone.glb (first target)
+      const droneAnchor = mindarThree.addAnchor(0); // Target index 0 for drone
+      loader.load('Drone.glb', (gltf) => {
+        const droneModel = gltf.scene;
+        droneModel.scale.set(0.5, 0.5, 0.5); // Scale the drone model appropriately
+        droneModel.position.set(0, 0, 0); // Position it in the center
+        droneAnchor.group.add(droneModel); // Add the drone model to the drone anchor
+
+        // Add the drone feature image
+        addFeatureImage(droneAnchor, 'Drone features.png'); // Path to the drone features PNG
+      }, undefined, (error) => {
+        console.error('An error occurred while loading the drone model', error);
+      });
+
+      // Anchor for Laptop.glb (second target)
+      const laptopAnchor = mindarThree.addAnchor(1); // Target index 1 for laptop
+      loader.load('Laptop.glb', (gltf) => {
+        const laptopModel = gltf.scene;
+        laptopModel.scale.set(0.5, 0.5, 0.5); // Scale the laptop model appropriately
+        laptopModel.position.set(0, 0, 0); // Position it in the center
+        laptopAnchor.group.add(laptopModel); // Add the laptop model to the laptop anchor
+
+        // Add the laptop feature image
+        addFeatureImage(laptopAnchor, 'Laptop features.png'); // Path to the laptop features PNG
+      }, undefined, (error) => {
+        console.error('An error occurred while loading the laptop model', error);
+      });
+
+      // Anchor for Phone.glb (third target)
+      const phoneAnchor = mindarThree.addAnchor(2); // Target index 2 for phone
+      loader.load('Motorcycle.glb', (gltf) => {
+        const phoneModel = gltf.scene;
+        phoneModel.scale.set(0.5, 0.5, 0.5); // Scale the phone model appropriately
+        phoneModel.position.set(0, 0, 0); // Position it in the center
+        phoneAnchor.group.add(phoneModel); // Add the phone model to the phone anchor
+
+        // Add the phone feature image
+        addFeatureImage(phoneAnchor, 'Motorcycle features.png'); // Path to the phone features PNG
+      }, undefined, (error) => {
+        console.error('An error occurred while loading the phone model', error);
+      });
+
+      // Start MindAR and render loop
+      const start = async() => {
+	await mindarThree.start();
+	renderer.setAnimationLoop(() => {
+	  renderer.render(scene, camera);
+	});
+      }
+
+      // Control for starting and stopping the AR experience
+      const startButton = document.querySelector("#startButton");
+      startButton.addEventListener("click", () => {
+	start();
+      });
+
+      const stopButton = document.querySelector("#stopButton");
+      stopButton.addEventListener("click", () => {
+	mindarThree.stop();
+	mindarThree.renderer.setAnimationLoop(null);
+      });
+    </script>
+    <style>
+      body {
+	margin: 0;
+      }
+      #container {
+	width: 100vw;
+	height: 100vh;
+	position: relative;
+	overflow: hidden;
+      }
+      #control {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="control">
+      <button id="startButton">Start</button>
+      <button id="stopButton">Stop</button>
+    </div>
+    <div id="container">
+    </div>
+  </body>
+</html>
