@@ -1,0 +1,97 @@
+<html></html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="importmap">
+    {
+      "imports": {
+	"three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+	"three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+	"mindar-image-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"
+      }
+    }
+    </script>
+    <script type="module">
+      import * as THREE from 'three';
+      import { MindARThree } from 'mindar-image-three';
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'; // For loading the drone model
+
+      const mindarThree = new MindARThree({
+	container: document.querySelector("#container"),
+	imageTargetSrc: "targets.mind" // Target image
+      });
+
+      const {renderer, scene, camera} = mindarThree;
+      const anchor = mindarThree.addAnchor(0); // Adjust the index based on your target
+
+      // Add Ambient and Directional Light for the 3D Model
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(1, 1, 1).normalize();
+      scene.add(directionalLight);
+
+      // Load and display the drone 3D model
+      const loader = new GLTFLoader();
+      loader.load('drone.glb', (gltf) => {
+        const model = gltf.scene;
+        model.scale.set(0.5, 0.5, 0.5); // Scale the drone model appropriately
+        model.position.set(0, 0, 0); // Position it in the center
+        anchor.group.add(model); // Add the drone model to the anchor
+      }, undefined, (error) => {
+        console.error('An error occurred while loading the model', error);
+      });
+
+      // Add a Plane to display text or features about the drone
+      const featurePlaneGeometry = new THREE.PlaneGeometry(1, 0.5); // Adjust size based on text/image
+      const textureLoader = new THREE.TextureLoader();
+      textureLoader.load('drone-features.png', (texture) => { // Use a PNG image for the feature info
+        const featureMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+        const featurePlane = new THREE.Mesh(featurePlaneGeometry, featureMaterial);
+        featurePlane.position.set(0, -0.75, 0); // Position the feature info below the drone model
+        anchor.group.add(featurePlane); // Add the feature plane to the anchor
+      });
+
+      const start = async() => {
+	await mindarThree.start();
+	renderer.setAnimationLoop(() => {
+	  renderer.render(scene, camera);
+	});
+      }
+
+      const startButton = document.querySelector("#startButton");
+      startButton.addEventListener("click", () => {
+	start();
+      });
+
+      stopButton.addEventListener("click", () => {
+	mindarThree.stop();
+	mindarThree.renderer.setAnimationLoop(null);
+      });
+    </script>
+    <style>
+      body {
+	margin: 0;
+      }
+      #container {
+	width: 100vw;
+	height: 100vh;
+	position: relative;
+	overflow: hidden;
+      }
+      #control {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="control">
+      <button id="startButton">Start</button>
+      <button id="stopButton">Stop</button>
+    </div>
+    <div id="container">
+    </div>
+  </body>
+</html>
